@@ -1,6 +1,7 @@
-const { app, BrowserWindow, Tray, Menu, globalShortcut, ipcMain, Notification, screen, nativeImage } = require('electron');
+const { app, BrowserWindow, Tray, Menu, globalShortcut, ipcMain, Notification, screen, nativeImage, dialog } = require('electron');
 const path = require('path');
 const fs = require('fs');
+const { pathToFileURL } = require('url');
 
 let mainWindow = null;
 let widgetWindow = null;
@@ -29,8 +30,12 @@ async function startLocalBackend() {
   process.env.PORT = String(serverPort);
 
   // Dynamically import ESM server.ts / compiled server
-  const serverModulePath = path.join(__dirname, '..', 'server.ts');
-  const mod = await import(serverModulePath);
+  process.env.OFFICE_DESK_DIST_PATH = path.join(app.getAppPath(), 'dist');
+  const serverModulePath = path.join(app.getAppPath(), 'dist-electron', 'server.mjs');
+  if (!fs.existsSync(serverModulePath)) {
+    throw new Error(`فایل سرور برنامه پیدا نشد: ${serverModulePath}`);
+  }
+  const mod = await import(pathToFileURL(serverModulePath).href);
   serverInstance = await mod.startServer();
   return serverInstance;
 }
@@ -246,6 +251,7 @@ function startBackgroundReminderLoop() {
 }
 
 app.whenReady().then(async () => {
+  try {
   await startLocalBackend();
   const settings = serverInstance.db.getSettings();
 
@@ -293,6 +299,12 @@ app.whenReady().then(async () => {
     }
     return updated;
   });
+  } catch (error) {
+    const details = error && error.stack ? error.stack : String(error);
+    console.error('Office Desk Assistant startup failed:', details);
+    dialog.showErrorBox('خطا در اجرای دستیار دفتر', `برنامه نتوانست راه‌اندازی شود.\n\n${details}`);
+    app.quit();
+  }
 });
 
 app.on('window-all-closed', () => {
