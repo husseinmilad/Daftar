@@ -1,7 +1,7 @@
 {
-  "name": "react-example",
+  "name": "daftar-office-desk",
   "private": true,
-  "version": "0.0.0",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
@@ -36,6 +36,10 @@
     "tailwindcss": "^4.3.3",
     "tsx": "^4.21.0",
     "typescript": "^7.0.2",
-    "@types/express": "^4.17.21"
-  }
+    "@types/express": "^4.17.21",
+    "electron": "^40.0.0",
+    "electron-builder": "^26.0.12"
+  },
+  "description": "دستیار دفتر؛ مدیریت یادداشت‌ها، کارها و یادآوری‌ها",
+  "main": "electron/main.cjs"
 }
