@@ -15,9 +15,6 @@ win:
     - target: nsis
       arch:
         - x64
-    - target: msi
-      arch:
-        - x64
   artifactName: Office-Desk-Assistant-Setup-${version}.${ext}
 nsis:
   oneClick: false
@@ -26,6 +23,3 @@ nsis:
   createDesktopShortcut: true
   createStartMenuShortcut: true
   shortcutName: دستیار دفتر
-msi:
-  oneClick: false
-  perMachine: false
