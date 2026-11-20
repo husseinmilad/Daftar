@@ -235,8 +235,23 @@ export async function startServer() {
   }
 
   const PORT = Number(process.env.PORT || 3000);
-  const server = app.listen(PORT, '0.0.0.0', () => {
-    console.log(`Office Desk Assistant running on http://localhost:${PORT}`);
+  const server = app.listen(PORT, '127.0.0.1', () => {
+    console.log(`Office Desk Assistant running on http://127.0.0.1:${PORT}`);
+  });
+
+  // Do not let Electron create a hidden window until the HTTP server is listening.
+  await new Promise<void>((resolve, reject) => {
+    if (server.listening) return resolve();
+    const onError = (error: Error) => {
+      server.off('listening', onListening);
+      reject(error);
+    };
+    const onListening = () => {
+      server.off('error', onError);
+      resolve();
+    };
+    server.once('error', onError);
+    server.once('listening', onListening);
   });
 
   return { app, server, db };
