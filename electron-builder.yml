@@ -1,0 +1,34 @@
+appId: com.officedesk.assistant
+productName: Office Desk Assistant
+copyright: Copyright © 2026 Office Desk Assistant
+directories:
+  output: release
+files:
+  - dist/**/*
+  - electron/**/*
+  - server.ts
+  - src/server/**/*
+  - src/types.ts
+  - package.json
+win:
+  target:
+    - target: nsis
+      arch:
+        - x64
+    - target: msi
+      arch:
+        - x64
+    - target: portable
+      arch:
+        - x64
+  artifactName: Office-Desk-Assistant-Setup-${version}.${ext}
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  createDesktopShortcut: true
+  createStartMenuShortcut: true
+  shortcutName: دستیار دفتر
+msi:
+  oneClick: false
+  perMachine: false

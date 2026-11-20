@@ -1,0 +1,51 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  :root {
+    font-family: 'Vazirmatn', 'Tahoma', 'Segoe UI', system-ui, sans-serif;
+  }
+
+  body {
+    font-family: 'Vazirmatn', 'Tahoma', 'Segoe UI', system-ui, sans-serif;
+    overflow-x: hidden;
+  }
+
+  .font-mono-nums {
+    font-family: 'JetBrains Mono', 'Vazirmatn', monospace;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .tabular-nums {
+    font-variant-numeric: tabular-nums;
+  }
+}
+
+/* Subtle refined scrollbars for desktop office use */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.35);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.55);
+}
+
+/* Frameless drag support for Electron widget window */
+.app-drag {
+  -webkit-app-region: drag;
+}
+
+.app-no-drag {
+  -webkit-app-region: no-drag;
+}
+

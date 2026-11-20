@@ -1,0 +1,6 @@
+{
+  "name": "دستیار دفتر — Office Desk Assistant",
+  "description": "دستیار هوشمند امور دفتری، ثبت سریع یادداشت، تقویم شمسی، یادآوری و مدیریت پیگیری کارها برای ویندوز",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
