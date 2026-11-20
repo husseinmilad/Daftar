@@ -18,9 +18,6 @@ win:
     - target: msi
       arch:
         - x64
-    - target: portable
-      arch:
-        - x64
   artifactName: Office-Desk-Assistant-Setup-${version}.${ext}
 nsis:
   oneClick: false
