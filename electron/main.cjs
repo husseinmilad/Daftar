@@ -9,6 +9,17 @@ let tray = null;
 let isQuitting = false;
 let serverInstance = null;
 let serverPort = 3000;
+let startupLogPath = null;
+
+function writeStartupLog(message) {
+  try {
+    const line = `[${new Date().toISOString()}] ${message}\n`;
+    if (startupLogPath) fs.appendFileSync(startupLogPath, line, 'utf8');
+    else console.error(line);
+  } catch (err) {
+    console.error('Could not write startup log:', err);
+  }
+}
 
 // Clean SVG data URI icon for Tray & Window
 const ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64" fill="none">
@@ -67,9 +78,25 @@ function createMainWindow() {
     },
   });
 
-  mainWindow.loadURL(getAppUrl());
+  mainWindow.webContents.on('did-fail-load', (_event, errorCode, errorDescription, validatedURL, isMainFrame) => {
+    if (!isMainFrame) return;
+    writeStartupLog(`Main window load failed (${errorCode}): ${errorDescription}; URL: ${validatedURL}`);
+    mainWindow?.show();
+    dialog.showErrorBox(
+      'خطا در بارگذاری دستیار دفتر',
+      `صفحه برنامه بارگذاری نشد.\nکد خطا: ${errorCode}\nشرح: ${errorDescription}\n\nگزارش خطا: ${startupLogPath || 'در دسترس نیست'}`
+    );
+  });
+
   mainWindow.once('ready-to-show', () => {
-    mainWindow.show();
+    writeStartupLog('Main window is ready to show.');
+    mainWindow?.show();
+  });
+
+  mainWindow.loadURL(getAppUrl()).catch((error) => {
+    writeStartupLog(`loadURL rejected: ${error?.stack || error}`);
+    if (mainWindow && !mainWindow.isDestroyed()) mainWindow.show();
+    dialog.showErrorBox('خطا در باز کردن پنجره', String(error?.stack || error));
   });
 
   // Hide to System Tray when closed instead of terminating background reminders
@@ -252,7 +279,17 @@ function startBackgroundReminderLoop() {
 
 app.whenReady().then(async () => {
   try {
+  startupLogPath = path.join(app.getPath('userData'), 'startup.log');
+  writeStartupLog('Application ready; starting local backend.');
+  process.on('uncaughtException', (error) => {
+    writeStartupLog(`uncaughtException: ${error?.stack || error}`);
+    try { dialog.showErrorBox('خطای پیش‌بینی‌نشده دستیار دفتر', String(error?.stack || error)); } catch {}
+  });
+  process.on('unhandledRejection', (reason) => {
+    writeStartupLog(`unhandledRejection: ${reason?.stack || reason}`);
+  });
   await startLocalBackend();
+  writeStartupLog('Local backend started successfully.');
   const settings = serverInstance.db.getSettings();
 
   app.setLoginItemSettings({
@@ -301,6 +338,7 @@ app.whenReady().then(async () => {
   });
   } catch (error) {
     const details = error && error.stack ? error.stack : String(error);
+    writeStartupLog(`Startup failed: ${details}`);
     console.error('Office Desk Assistant startup failed:', details);
     dialog.showErrorBox('خطا در اجرای دستیار دفتر', `برنامه نتوانست راه‌اندازی شود.\n\n${details}`);
     app.quit();
