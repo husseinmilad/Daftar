@@ -34,7 +34,7 @@ jobs:
       - name: Install dependencies
         run: npm install --no-audit --no-fund
 
-      - name: Build Windows installers and portable EXE
+      - name: Build Windows NSIS installer
         run: npm run electron:build
 
       - name: Upload Windows packages
@@ -43,6 +43,5 @@ jobs:
           name: Daftar-Windows-${{ github.run_number }}
           path: |
             release/*.exe
-            release/*.msi
           if-no-files-found: error
           retention-days: 30
